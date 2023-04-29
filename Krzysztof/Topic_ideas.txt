@@ -7,3 +7,12 @@ lub to samo ale pogrupowane dla przewoznikow
 Ktora trasa byle najmiej bezpieczna (najwiecej odwolanych lotow ze wzgledu na bezpieczenstwo)
 
 Dokąd ludzie latali najchetniej? 
+
+
+Pytania z pliku z zadaniami:
+1. Kiedy jest najlepsza pora dnia/dzień tygodnia/pora roku na lot, aby zminimalizować opóźnienia?
+2. Czy starsze samoloty mają więcej opóźnień?
+3. Jak zmienia się liczba osób latających pomiędzy różnymi lokalizacjami w czasie?
+4. Jak bardzo pogoda wpływa opóźnienia samolotów?
+5. Czy można wykryć awarie kaskadowe, gdy opóźnienia na jednym lotnisku powodują opóźnienia na
+innych?
