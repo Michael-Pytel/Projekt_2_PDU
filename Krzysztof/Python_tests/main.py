@@ -12,6 +12,8 @@ def main():
     df = df.sort_values(by="NR", ascending=False)  # sort rows by NR values
     df.index = sorted(df.index)  # change row names
     print(df)
+    df_project = pd.read_csv("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/2007.csv")
+    print(df_project.head(10))
 
 
 if __name__ == '__main__':
