@@ -1,14 +1,13 @@
 library('data.table')
 library('Dict')
 
-
-df_project <- read.csv("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/2007.csv")
+df_project <- read.csv("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/2000.csv")
 View(head(df_project,10))
 
 df_project <- as.data.table(df_project)
 paste(colnames(df_project), collapse = ', ')
 
-#rm(result)
+rm(list = ls())
 
 num_of_flights_daily <- function(dataFrame){
   #Uses data.table package
@@ -31,7 +30,7 @@ cancellations_stats <- function(dataFrame){
   
 }
 
-tmp <- num_of_flights_daily(df_project)
+tmp <- num_of_flights_daily(get("df_project"))
 class(tmp)
 tmp[(Month == 9 & DayofMonth == 11),]
 mean(tmp$Count)
