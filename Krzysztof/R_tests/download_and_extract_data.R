@@ -57,10 +57,10 @@ massUnpack_bzip2 <- function(files, ext = '.csv.bz2'){
 
 #TESTS- production
 #######
-urls <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/YGU3TD")
+urls <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/XTPZZY")
 dest <- "~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane"
-file_names <- c("2000")
-massDownload(urls,dest, file_names = file_names)
+file_names <- c("airports")
+massDownload(urls,dest, file_names = file_names, ext = ".csv")
 
 ?system2
 old_wd <- getwd()
@@ -158,4 +158,38 @@ for(i in 1:length(urls_frames)){
   
   cat('Cleaning complete\n')
 }
-rm(df_2001)
+
+##############################
+execute_function_on_frame <- function(data_directory, names_frames, FUN){
+  
+  files <- file.path(data_directory, names_frames)
+  
+  for(i in 1:length(names_frames)){
+    cat(paste("i = ", i,"\n", sep = ""))
+    
+    #create variable
+    df_name <- paste("df_", names_frames[i], sep = "")
+    cat(df_name,'\n')
+    
+    assign(df_name, read.csv(paste(files[i], ".csv", sep="")))
+    cat(class(df_name),'\n')
+    #execute function
+    assign(df_name, FUN(get(df_name)))
+    cat(class(df_name),'\n')
+    cat('Analysis complete\n')
+    
+    #  #delete file
+    #  system2("rm", args = paste(files[i], ".csv", sep=""))
+    
+    #clean memory
+    #gc() # free unused memory
+    
+    #cat('Cleaning complete\n')
+    df_name
+  } ->result
+  result
+}
+
+result <- execute_function_on_frame(data_directory = dest, names_frames =  c("airports"), FUN = function(x){return(x)})
+
+rm(list = ls())
