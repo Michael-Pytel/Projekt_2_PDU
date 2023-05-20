@@ -1,15 +1,12 @@
+setwd("C:\\Users\\admin\\Documents\\Github\\Projekt_2_PDU")
 Flights_2021 <- read.csv("./Dane/2001.csv")
 library(dplyr)
 
-dplyr <- function(Flights_2021){
-  result <- Flights_2021 %>%
-    mutate(One, 1) %>%
-    group_by(Month) %>%
-    summarize(Total = sum(One)) %>%
-    arrange(desc(Total)) %>%
-    slice_head(n=10)
+funk <- function(Flights_2021){
+  dt <- as.data.table(Flights_2021)
+  dt <- df[.()]
   
   return(result)
 }
 
-dplyr(Flights_2021)
+funk(Flights_2021)
