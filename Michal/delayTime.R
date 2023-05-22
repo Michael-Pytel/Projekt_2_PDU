@@ -1,4 +1,7 @@
-df_2007 <- read.csv("../Dane/2007.csv")
+setwd("C:\\Users\\admin\\Documents\\Github\\Projekt_2_PDU")
+df_2007 <- read.csv("Dane/2006.csv")
+
+library("dplyr")
 
 DepDelay <- df_2007 %>%
   filter(Cancelled == 0) %>%
@@ -45,7 +48,57 @@ df_merged <- DepDelay %>%
   left_join(SecurityDelay, by = "Month") %>%
   left_join(LateAircraftDelay, by = "Month")
 
+df_merged
+
 df_summed <- df_merged %>%
-  mutate(TotalDelay = MeanCarrierDelay + MeanWeatherDelay + MeanNASDelay + MeanSecurityDelay + MeanLateAircraftDelay)
+  mutate(TotalDelay = 
+           MeanCarrierDelay + MeanWeatherDelay + MeanNASDelay + MeanSecurityDelay + MeanLateAircraftDelay +
+           MeanDepDelay + MeanArrDelay)
+df_summed
+
+# install.packages("ggplot2")
+# library("ggplot2")
+
+barplot(height = df_summed$TotalDelay, names = df_summed$Month)
+
+m <- mean(df_summed$TotalDelay)
+df_summed["GreaterThanMean"] <- df_summed$TotalDelay > m
+# df["CancelledPercentage"] <- df$CancelledFlights/df$AllFlights * 100
+# mp <- mean(df$CancelledPercentage)
+# df["GrThanCanPercMean"] <- df$CancelledPercentage > mp 
+
+
+
+
+
+# ggplot(data = df_summed, aes(x = Month, 
+#                       y = TotalDelay, 
+#                       fill = GreaterThanMean))+ 
+#   geom_col() + 
+#   scale_fill_manual(values = c("blue", "lightblue"))+
+#   geom_hline(yintercept = m, 
+#              linetype = "dashed", 
+#              colour = "red") +
+#   scale_y_continuous(expand = c(0, 0), 
+#                      limits = c(0, max(df_summed$TotalDelay)))+
+#   geom_text(aes(label = TotalDelay),
+#             angle = 90,
+#             hjust = 1.1) +
+#   theme_gray()+
+#   theme(legend.position = "none")
+
+
+ggplot(data = df_summed, aes(x = Month, y = TotalDelay, fill = GreaterThanMean)) + 
+  geom_col() + 
+  scale_fill_manual(values = c("yellow", "lightblue")) +
+  geom_hline(yintercept = m, linetype = "dashed", colour = "red") +
+  scale_y_continuous(expand = c(0, 0), limits = c(0, max(df_summed$TotalDelay)+5)) +
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  geom_text(aes(label = sprintf("%.2f", TotalDelay)), angle = 90, hjust = 1.1) +
+  theme_gray() +
+  theme(legend.position = "none") +
+  labs(x = "Month", 
+       y = "Total Delay", 
+       title = "Total Delay by Month")
 
 
