@@ -1,6 +1,6 @@
 setwd("C:\\Users\\admin\\Documents\\Github\\Projekt_2_PDU")
 Df <- read.csv("Dane/2007.csv")
-Aircafts <- read.csv("Dane/plane-data.csv")
+Aircrafts <- read.csv("Dane/plane-data.csv")
 
 df_test <- Df %>%
   filter(Month == 1) %>%
@@ -12,9 +12,19 @@ model_catching_up <- function(Df, Aircrafts){
     mutate(DiffDelay = DepDelay - ArrDelay) %>%
     select(TailNum, DiffDelay) 
   
-  total_diff <- diff %>%
-    
-   
+  diff_with_models <- merge(diff, Aircrafts, by.x = "TailNum", by.y = "tailnum")
+
+  
+  
+  result <- diff_with_models %>%
+    group_by(year) %>%
+    summarize(AvgCatchUp = mean(DiffDelay, na.rm = TRUE), count = n()) %>%
+    arrange(desc(year))
+  result <- result[2:49,]
+  barplot(height = result$AvgCatchUp, names = result$model)
+  
+  ggplot(result, aes(x = year, y = AvgCatchUp)) +
+    geom_point()
 }
 
 test <- model_catching_up(Df, Aircrafts)
