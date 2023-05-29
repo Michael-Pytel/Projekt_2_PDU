@@ -55,47 +55,48 @@ massUnpack_bzip2 <- function(files, ext = '.csv.bz2'){
   invisible(info)
 }
 
-#TESTS- production
+#TESTS- production, do not execute, may generate errors
+#learning to use some functions
 #######
-urls <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/XTPZZY")
-dest <- "~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane"
-file_names <- c("airports")
-massDownload(urls,dest, file_names = file_names, ext = ".csv")
+#urls <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/XTPZZY")
+#dest <- "~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane"
+#file_names <- c("airports")
+#massDownload(urls,dest, file_names = file_names, ext = ".csv")
 
-?system2
-old_wd <- getwd()
-getwd()
-test_f <- file.path(dest, "2000.csv.bz2")
+#?system2
+#old_wd <- getwd()
+#getwd()
+#test_f <- file.path(dest, "2000.csv.bz2")
 
-system2("rm", args = file.path(dest, "2000.csv"))
-system2("bzip2", args = sprintf("-d %s", test_f))
+#system2("rm", args = file.path(dest, "2000.csv"))
+#system2("bzip2", args = sprintf("-d %s", test_f))
 
 
 
 #############
-urls_test2 <- c("https://pl.wikipedia.org/wiki/Madryt",
-                "https://pl.wikipedia.org/wiki/Warszawa")
+#urls_test2 <- c("https://pl.wikipedia.org/wiki/Madryt",
+#                "https://pl.wikipedia.org/wiki/Warszawa")
 
-file_names <- c("Madryt", "Warszawa")
+#file_names <- c("Madryt", "Warszawa")
 
-massDownload(urls_test2,dest,file_names = file_names, ext = ".html")
+#massDownload(urls_test2,dest,file_names = file_names, ext = ".html")
 
-file_names <- file.path(dest, file_names) 
-massUnpack_bzip2(file_names, ".html.bz2")
+#file_names <- file.path(dest, file_names) 
+#massUnpack_bzip2(file_names, ".html.bz2")
 
-airports <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/XTPZZY")
-mass###to do
+#airports <- c("https://dataverse.harvard.edu/api/access/datafile/:persistentId?persistentId=doi:10.7910/DVN/HG7NV7/XTPZZY")
 
-rm(list = ls())
+#rm(list = ls())
 
 #FINAL VERSION 1.1
 ###########################################
 #
 library('data.table')
 
-#Download first frame, then do numbers_of_flights_daily, save result as df%year%, 
-# and remove frame from memory
-#then repeat instructions with the second frame
+#This code:
+#Downloads first frame, then does numbers_of_flights_daily, saves result as df%year%, 
+# and removes frame from memory
+#then repeats instructions with the second frame
 
 #Please read INFO
 
@@ -160,6 +161,8 @@ for(i in 1:length(urls_frames)){
 }
 
 ##############################
+##############################
+#not useful
 execute_function_on_frame <- function(data_directory, names_frames, FUN){
   
   files <- file.path(data_directory, names_frames)
@@ -192,4 +195,4 @@ execute_function_on_frame <- function(data_directory, names_frames, FUN){
 
 result <- execute_function_on_frame(data_directory = dest, names_frames =  c("airports"), FUN = function(x){return(x)})
 
-rm(list = ls())
+#rm(list = ls())

@@ -31,7 +31,7 @@ df_1996 <- as.data.table(read.csv(file.path(years_dir,"1996.csv")))
 df_1996 <- df_1996[, .( "totalFlights" = .N), keyby = .(Origin,Dest)]
 df_1996 <- df_1996[order(totalFlights, decreasing = T),]
 
-#scalanie tras (sumowanie lotow w dwie strony)
+#merging routes (adding count of flights in both ways on the same route/path)
 df_1 <- df_1996[,.(Origin,Dest, totalFlights, "Route" = paste(Origin,Dest))]
 df_2 <- df_1996[,.(totalFlights, 
                    "Route" = paste(Dest,Origin))]
@@ -50,7 +50,7 @@ total_routes <- total_routes[order(totalFlights,decreasing = T),]
 
 ####
 
-s <- c(1996)
+s <- c(1996) # for setting suffixes in merge() function
 for(y in 1997:2008){
   cat(paste("current year: ", y,"\n", sep = ""))
   df_name <- paste("df_", y, sep = "")
@@ -64,7 +64,7 @@ for(y in 1997:2008){
   assign(df_name,get(df_name)[, .( "totalFlights" = .N), keyby = .(Origin,Dest)])
   assign(df_name,get(df_name)[order(totalFlights, decreasing = T),])
   
-  #scalanie tras (sumowanie lotow w dwie strony)
+  #merging routes (adding count of flights in both ways on the same route/path)
   df_1 <- get(df_name)[,.(Origin,Dest, totalFlights, "Route" = paste(Origin,Dest))]
   df_2 <- get(df_name)[,.(totalFlights, 
                      "Route" = paste(Dest,Origin))]
@@ -87,12 +87,13 @@ for(y in 1997:2008){
                                    all = T, 
                                    by = c("Origin", "Dest"),
                                    suffixes = s)
-  cat("Collecting complete\n")
+  cat("Third step complete\n")
   
-  rm(list = ls(pattern = df_name))
+  rm(list = ls(pattern = df_name)) # we only need total_routes frame
   gc()
   cat("Cleaning complete\n")
 }
+
 total_routes <- total_routes[,
                              .("totalFlights" = sum(totalFlights,
                                                     totalFlights1997,
@@ -113,6 +114,7 @@ total_routes <- total_routes[order(totalFlights,decreasing = T)]
 
 top_50 <- head(total_routes,50)
 
+# adding coordinates of airports
 origins_transformed <- merge.data.table(top_50, ap_transformed, 
                  by.x = "Origin", by.y = "iata", suffixes = "Origin")
 origins_transformed2 <- merge.data.table(origins_transformed, 
@@ -127,7 +129,9 @@ total_ap <- merge.data.table(origins_transformed2[,.(Origin),
 total_ap <- total_ap[is.na(xOrigin), xOrigin:=xDest]
 total_ap <- total_ap[is.na(yOrigin), yOrigin:=yDest] 
 total_ap <- total_ap[,.(Origin,xOrigin,yOrigin)]
+#end of prepairng data
 
+# plot
 plot_usmap() +
   geom_segment(data = origins_transformed2, 
                aes(x = xOrigin, y = yOrigin, xend = xDest, yend = yDest, 
@@ -145,36 +149,35 @@ plot_usmap() +
                   box.padding   = 0.35, 
                   point.padding = 0.5,
                   segment.color = 'grey50') +
-  ggtitle("The most common flight routes in 1996-2008") +
-  labs(linewidth = "Flights")+
+  ggtitle("50 najpopularniejszych tras lotniczych w latach 1996-2008") +
+  labs(linewidth = "Loty")+
   theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 16), 
         legend.title = element_text(face = "bold", size= 11),
         legend.position = c(0.95, 0.4))
   
 
-?geom_line
-?geom_segment
-?guide_legend
-?geom_text_repel
+#?geom_line
+#?geom_segment
+#?guide_legend
+#?geom_text_repel
 
 #################tests
-year_1996 <- read.csv(file.path("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/",
-                                paste("year_1996", ".csv", sep ="")))
-year_1996 <- as.data.table(year_1996)[,.(Dest, Total)]
+#year_1996 <- read.csv(file.path("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/",
+#                                paste("year_1996", ".csv", sep ="")))
+#year_1996 <- as.data.table(year_1996)[,.(Dest, Total)]
 
 
-dest_transformed <- merge.data.table(year_1996, ap_transformed, 
-                                        by.x = "Dest", by.y = "iata", suffixes = "Dest")
-plot_usmap() +
-  geom_point(data = dest_transformed, aes(x = x, 
-                                          y = y,
-                                          size = Total,
-                                          alpha = Total),color = "blue") +
-  scale_fill_discrete(labels=c("Count"), ) + 
-  ggtitle("Cancelled flights on 08.01.1996") +
-  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20), 
-        legend.position = c(0.9, 0.5),
-        legend.text = element_text(size = 12),
-        legend.title = element_text(size = 14)) 
+#dest_transformed <- merge.data.table(year_1996, ap_transformed, 
+#                                        by.x = "Dest", by.y = "iata", suffixes = "Dest")
+#plot_usmap() +
+#  geom_point(data = dest_transformed, aes(x = x, 
+#                                         y = y,                                         size = Total,
+#                                         alpha = Total),color = "blue") +
+#  scale_fill_discrete(labels=c("Count"), ) + 
+#  ggtitle("Cancelled flights on 08.01.1996") +
+#  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20), 
+#        legend.position = c(0.9, 0.5),
+#        legend.text = element_text(size = 12),
+#        legend.title = element_text(size = 14)) 
 
 

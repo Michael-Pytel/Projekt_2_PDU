@@ -2,7 +2,7 @@ cancellations_stats <- function(dataFrame){
   #Uses data.table package
   #returns a data.table
   
-  #Useful columns: Cancelled, CancellationCode
+  #Used columns: Cancelled, CancellationCode
   
   result <- as.data.table(dataFrame)[(Cancelled != 0), 
                                      .("Count" = .N),
@@ -32,7 +32,7 @@ massUnpack_bzip2 <- function(files, ext = '.csv.bz2'){
   invisible(info)
 }
 
-
+##important
 data_dir <-"~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/pliczki"
 files <- as.character(1987:2008)
 paths <- file.path(data_dir, paste(files,".csv", sep = ""))
@@ -42,7 +42,7 @@ paths <- file.path(data_dir, paste(files,".csv", sep = ""))
 
 
 x <- file.exists(paths)
-x[x!=T]
+length(x[x!=T])  #if result is different from 0, check your data_dir path
 
 library('data.table')
 library('ggplot2')
@@ -71,7 +71,7 @@ for(i in 1:length(paths)){
   
   cat('Cleaning complete\n')
 }
-?geom_bar
+#?geom_bar
 
 
 #plot
@@ -98,10 +98,16 @@ ggplot(data = df, aes(x = Year,
             angle = 90,
             hjust = 1.1) +
   theme_gray()+
-  theme(legend.position = "none")
+  ggtitle("Liczba odwołanych lotów w danym roku")+
+  xlab("Rok") +
+  ylab("Odwołania") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20),
+        legend.position = "none",
+        axis.title.y = element_text( family = "Arial"),
+        axis.title.x = element_text( family = "Arial"))
 
 ##cancellations (percentage)
-perc <- ggplot(data = df, aes(x = Year, 
+ggplot(data = df, aes(x = Year, 
                       y = CancelledPercentage, 
                       fill = GrThanCanPercMean))+ 
   geom_col() + 
@@ -116,19 +122,31 @@ perc <- ggplot(data = df, aes(x = Year,
             vjust = -0.5,
             ) +
   theme_gray()+
-  theme(legend.position = "none")
+  ggtitle("Procent odwołanych lotów ze wszystkich zarejestrowanych w danym roku")+
+  xlab("Rok") +
+  ylab("Odwołania (%)") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20),
+        legend.position = "none",
+        axis.title.y = element_text( family = "Arial"),
+        axis.title.x = element_text( family = "Arial"))
 
 ##total flights per year 
-perc + ggplot(data = df, aes(x = Year, 
+ggplot(data = df, aes(x = Year, 
                       y = AllFlights,
                       label = AllFlights, 
                       angle = 90 , hjust = 1.1))+ 
   geom_col(fill = "green") + geom_text() +
   scale_y_continuous(expand = c(0, 0), 
                      limits = c(0, max(df$AllFlights)*1.1)) +
-  theme(legend.position = "none")
+  ggtitle("Liczba zarejestrowanych lotów w danym roku")+
+  xlab("Rok") +
+  ylab("Loty") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20),
+        legend.position = "none",
+        axis.title.y = element_text( family = "Arial"),
+        axis.title.x = element_text( family = "Arial"))
 
-###save data
+###save data( we will use it in another script)
 write.csv(df, file = file.path("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/",
                                "cancellationsStatsPerYear.csv"))
 
@@ -138,27 +156,32 @@ for(i in 2003:2008){
                                  paste(df_name, ".csv", sep ="")))
 }
 
-?geom_text
-paths[1996-1987+1]
 
-year_1996 <- read.csv(paths[1996-1987+1])
-year_1996 <- as.data.table(year_1996) 
+#?geom_text
+#paths[1996-1987+1]
 
-check_1996 <- read.csv(paths[1996-1987+1])
-check_1996 <- as.data.table(check_1996)
+
+###do not execute, only tests
+#year_1996 <- read.csv(paths[1996-1987+1])
+#year_1996 <- as.data.table(year_1996) 
+
+#check_1996 <- read.csv(paths[1996-1987+1])
+#check_1996 <- as.data.table(check_1996)
 #View(head(check_2006,1000))
 
-check_1996 <- check_1996[Cancelled != 0, .("FlightsCancelled" = .N, ""),keyby = .(Month, DayofMonth)]
-check_1996 <- check_1996[order(FlightsCancelled, decreasing = T)]
-colnames(year_1996)
+#check_1996 <- check_1996[Cancelled != 0, .("FlightsCancelled" = .N, ""),keyby = .(Month, DayofMonth)]
+#check_1996 <- check_1996[order(FlightsCancelled, decreasing = T)]
+#colnames(year_1996)
 
-year_1996_2 <- year_1996[Month == 1 & DayofMonth == 8 & Cancelled == 1,
-                       .("Total" = .N), keyby=.(Dest)]
-year_1996_2 <- year_1996_2[order(Total,decreasing = T)]
+#year_1996_2 <- year_1996[Month == 1 & DayofMonth == 8 & Cancelled == 1,
+#                       .("Total" = .N), keyby=.(Dest)]
+#year_1996_2 <- year_1996_2[order(Total,decreasing = T)]
 
-write.csv(year_1996_2, file.path("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/",
-                                 paste("year_1996", ".csv", sep ="")))
+#write.csv(year_1996_2, file.path("~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/",
+#                                 paste("year_1996", ".csv", sep ="")))
 #rm(check_2006)
 #gc()
+
+
 
 

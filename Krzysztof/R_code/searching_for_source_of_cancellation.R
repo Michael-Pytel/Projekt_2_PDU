@@ -1,3 +1,4 @@
+rm(list = ls())  
 data_dir <-"~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Dane/"
 years_dir <- paste(data_dir,"pliczki/", sep = "")
 library(data.table)
@@ -44,12 +45,16 @@ for(y in 1:length(interesting_ones$Year)){
                       .("Total" = .N), 
                       keyby=.(Dest)]
   tmp <- tmp[order(Total,decreasing = T)]
-  assign(df_name, tmp)
-  cat("Second step complete\n")
   
+  tmp2 <- get(df_name)[Month == m & DayofMonth == d,
+                      .("All" = .N), 
+                      keyby=.(Dest)]
+  
+  assign(df_name, merge.data.table(tmp,tmp2, by = "Dest", all.x = T, all.y = F))
+  
+  cat("Second step of analysis complete\n")
   gc()
 }
-
 
 airports <- as.data.table(read.csv(file.path(data_dir, "airports.csv")))
 colnames(airports)
@@ -60,13 +65,13 @@ ap <- airports[airports$country == "USA", .("lon" = long, lat, iata)]
 ap_transformed <- usmap_transform(ap)
 rm(tmp)
 
-test <- df_1996 
+test <- df_1996[,.(Dest,Total)] 
 s <- c(1996)
 for (y in 2:length(interesting_ones$Year)){
   current_year <- interesting_ones$Year[y]
   df_name <- paste("df_", current_year, sep = "")
   s <- c("", current_year)
-  test <- merge.data.table(test, get(df_name), by = "Dest", all.y = T, all.x = T,
+  test <- merge.data.table(test, get(df_name)[,.(Dest,Total)], by = "Dest", all.y = T, all.x = T,
                            suffixes = s)
 }
 colnames(test)[2] <- "Total1996"
@@ -94,6 +99,7 @@ for(y in 1:length(interesting_ones$Year)){
       scale_size(limits = c(min_flights,max_flights)) +
       scale_alpha(limits = c(min_flights,max_flights)) +
       ggtitle(paste(interesting_ones[Year == interesting_ones$Year[y], MostCanAt])) +
+      labs(size = "Loty", alpha = "Loty")+
       theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 16), 
             legend.position = c(-0.5,-0.2),
             legend.direction = "horizontal",
@@ -118,8 +124,58 @@ for(y in 1:length(interesting_ones$Year)){
   assign(paste("p", y, sep = ""), tmp)
 }
 
+grid.arrange(
+  p1,
+  p2,
+  p3,
+  p4,
+  p5,
+  p6,
+  p7,
+  p8,
+  nrow = 2,
+  top = textGrob("Liczba odwołanych lotów w dniu: ", 
+                 gp = gpar(fontface = "bold", fontsize = 20), 
+                 y = 1, just = c(0.5, 3.0))
+)
 
+#the same analysis as above but now with percentage plots
 
+for(y in 1:length(interesting_ones$Year)){
+  df_name <- paste("df_", interesting_ones$Year[y], sep = "")  
+  
+  dest_transformed <- merge.data.table(get(df_name), ap_transformed, 
+                                       by.x = "Dest", by.y = "iata", suffixes = "Dest")
+  if(y == 7){
+    tmp <- plot_usmap() +
+      geom_point(data = dest_transformed, aes(x = x, 
+                                              y = y,
+                                              size = (Total/All)*100,
+                                              alpha = (Total/All)*100),color = "blue") +
+      #    scale_fill_discrete(labels=c("Count"), ) + 
+      ggtitle(paste(interesting_ones[Year == interesting_ones$Year[y], MostCanAt])) +
+      labs(size = "Loty", alpha = "Loty")+
+      theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 16), 
+            legend.position = c(-0.5,-0.2),
+            legend.direction = "horizontal",
+            legend.text = element_text(size = 10),
+            legend.title = element_text(size = 11))
+  } else {
+    tmp <- plot_usmap() +
+      geom_point(data = dest_transformed, aes(x = x, 
+                                              y = y,
+                                              size = (Total/All)*100,
+                                              alpha = (Total/All)*100),color = "blue") +
+      #    scale_fill_discrete(labels=c("Count"), ) + 
+      ggtitle(paste(interesting_ones[Year == interesting_ones$Year[y], MostCanAt])) +
+      theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 16), 
+            legend.position = "none")
+    #         legend.direction = "vertical",
+    #          legend.text = element_text(size = 10),
+    #          legend.title = element_text(size = 11))
+  }
+  assign(paste("p", y, sep = ""), tmp)
+}
 
 grid.arrange(
   p1,
@@ -131,34 +187,41 @@ grid.arrange(
   p7,
   p8,
   nrow = 2,
-  top = textGrob("Mapy liczby odwołanych lotów dla lotnisk w dniu: ", 
+  top = textGrob("Procent odwołanych lotów w dniu: ", 
                  gp = gpar(fontface = "bold", fontsize = 20), 
-                 y = 1, just = c(0.5, 2.6))
+                 y = 1, just = c(0.5, 3.0))
 )
 
 
+
+
+
 #additional analysys
-check <- read.csv(file.path(years_dir, "2004.csv"))
-check <- as.data.table(check)[Cancelled != 0, 
-                    .("FlightsCancelled" = .N),
-                    keyby = .(Month, DayofMonth)]
-check <- check[order(FlightsCancelled, decreasing = T)]
-rm(check)
+#check <- read.csv(file.path(years_dir, "2004.csv"))
+#check <- as.data.table(check)[Cancelled != 0, 
+#                    .("FlightsCancelled" = .N),
+#                    keyby = .(Month, DayofMonth)]
+#check <- check[order(FlightsCancelled, decreasing = T)]
+#rm(check)
 
 ##### part 2
 cancellation_sources <- as.data.frame(LETTERS[1:4])
 colnames(cancellation_sources) <- c("Code")
 cancellation_sources['Total'] <- rep(0, times = 4)
+data_dir <- "~/laby_PDU/Projekt_2_outer/Projekt_2_PDU/Krzysztof/R_code/saved/"
 
 for(y in 2003:2008){
   cat(paste("current year: ", y,"\n", sep = ""))
   df_name <- paste("df2_", y, sep = "")
-  assign(df_name, as.data.table(read.csv(paste(data_dir, 
+  assign(df_name, as.data.table(read.csv(file.path(data_dir, 
                                                paste("df_",
                                                      y,
                                                      ".csv", 
-                                                     sep = ""), 
-                                               sep = ""))))
+                                                     sep = "")
+                                               )
+                                         )
+                                )
+         )
   cat("Reading data complete\n")
   cancellation_sources["Total"] <-cancellation_sources$Total + get(df_name)[!is.na(CancellationCode), .(Count)]
   gc()
@@ -166,18 +229,15 @@ for(y in 2003:2008){
 
 #changing CancellationCode values
 n_codes <- Dict$new(
-  "A" = "carrier", 
-  "B" = "weather", 
+  "A" = "przewoźnik", 
+  "B" = "pogoda", 
   "C" = "NAS", 
-  "D" = "security")
+  "D" = "bezpieczeństwo")
 
 for(row in 1:length(cancellation_sources$Code)){
   value <- cancellation_sources$Code[row]
   cancellation_sources$Code[row] <- n_codes$get(value)
 }
-
-#cleaning
-rm(row,value,xlim)  
 
 ggplot(data = cancellation_sources, 
        aes(reorder(Code, Total), Total, fill = Code))+
@@ -188,10 +248,13 @@ ggplot(data = cancellation_sources,
             angle = 0,
             vjust = -0.5) +
   theme_gray()+
-  xlab("Code")+
-  theme(legend.position = "none", 
+  ggtitle("Liczba odwołanych lotów o danym kodzie odwołania (suma z lat 2003:2008)")+
+  xlab("Kod odwołania")+
+  ylab("Loty")+
+  labs(fill = "Kod")+
+  theme(plot.title = element_text(hjust = 0.5, face = "bold", size= 20),
         axis.text.y = element_blank(),
-        axis.title.y = element_text( family = "Arial"),
+        axis.ticks.y = element_blank(),
         axis.title.x = element_text( family = "Arial"))
 
   
