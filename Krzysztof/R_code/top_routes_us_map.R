@@ -24,6 +24,18 @@ ap_transformed <- usmap_transform(ap)
 #?aes
 #rm(num_of_flights_daily)
 
+#########################
+#how does this code work: (simplified/short description):
+#1.generate a frame with all flight routes in 1996
+#in totalFlight column is a number of flights between Origin and Dest
+#we count Origin->Dest and Dest->Origin as the same route (merging routes step)
+#2.merge this pregenerated frame with frames of other years, 
+#each year has it owns column in a result frame
+#3. sum all columns for each rout(row) and save in one column
+#4. then merge it with frame with the one with airports' coordinates 
+#5. some cleanig (preparing frame forma for plotting)
+#6. generating plot
+###########################
 
 ###preparing first frame
 df_1996 <- as.data.table(read.csv(file.path(years_dir,"1996.csv")))

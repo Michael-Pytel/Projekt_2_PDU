@@ -81,9 +81,11 @@ colnames(test)[2] <- "Total1996"
 max_flights <- max(sapply(test[,2:9], max, na.rm = T))
 min_flights <- min(sapply(test[,2:9], min, na.rm = T))
 
-
+###############
 #plotting
 
+#generating plot for each year 
+#(map with shown cancelled flights on each airport)
 for(y in 1:length(interesting_ones$Year)){
   df_name <- paste("df_", interesting_ones$Year[y], sep = "")  
 
@@ -124,6 +126,7 @@ for(y in 1:length(interesting_ones$Year)){
   assign(paste("p", y, sep = ""), tmp)
 }
 
+#generating one plot with eight maps
 grid.arrange(
   p1,
   p2,
@@ -140,7 +143,6 @@ grid.arrange(
 )
 
 #the same analysis as above but now with percentage plots
-
 for(y in 1:length(interesting_ones$Year)){
   df_name <- paste("df_", interesting_ones$Year[y], sep = "")  
   
@@ -193,9 +195,6 @@ grid.arrange(
 )
 
 
-
-
-
 #additional analysys
 #check <- read.csv(file.path(years_dir, "2004.csv"))
 #check <- as.data.table(check)[Cancelled != 0, 
@@ -204,7 +203,7 @@ grid.arrange(
 #check <- check[order(FlightsCancelled, decreasing = T)]
 #rm(check)
 
-##### part 2
+##### part 2 (generating plot showing cancellations code stats in 2003-2008)
 cancellation_sources <- as.data.frame(LETTERS[1:4])
 colnames(cancellation_sources) <- c("Code")
 cancellation_sources['Total'] <- rep(0, times = 4)
@@ -239,6 +238,8 @@ for(row in 1:length(cancellation_sources$Code)){
   cancellation_sources$Code[row] <- n_codes$get(value)
 }
 
+#generating a plot with summed cancelled flights in 2003-2008
+#a column for each cancellation code, (4 columns as a result)
 ggplot(data = cancellation_sources, 
        aes(reorder(Code, Total), Total, fill = Code))+
   geom_col() +
