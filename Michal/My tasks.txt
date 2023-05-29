@@ -1,6 +1,0 @@
-Main goals:
-	Create data frames regarding cancellation types
-	Try to make a map using the cancellation data frame
-
-Working on:
-	sum of airtime by month in 2001
