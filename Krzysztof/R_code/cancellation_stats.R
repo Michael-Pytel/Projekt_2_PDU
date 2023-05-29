@@ -33,7 +33,7 @@ massUnpack_bzip2 <- function(files, ext = '.csv.bz2'){
 }
 
 ##########################
-#in this file is written a code that generates free plots showing cancellations stats:
+#in this file is written a code that generates three plots showing cancellations stats:
 #1.the amount of cancelled flights for each year
 #2.the percent of cancelled flights for each year
 #3. the amount of all flights registered in each year
