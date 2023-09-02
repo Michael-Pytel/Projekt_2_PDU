@@ -1,8 +1,11 @@
-setwd("C:\\Users\\admin\\Documents\\Github\\Projekt_2_PDU")
-Df <- read.csv("Dane/2006.csv")
-Aircrafts <- read.csv("Dane/plane-data.csv")
-library(dplyr)
-library(ggplot2)
+# setwd("C:\\Users\\admin\\Documents\\Github\\Projekt_2_PDU")
+# Df <- read.csv("Dane/2006.csv")
+# Aircrafts <- read.csv("Dane/plane-data.csv")
+# library(dplyr)
+# library(ggplot2)
+
+
+
 Df_selected <- Df %>%
   select(TailNum,ArrDelay)
 
